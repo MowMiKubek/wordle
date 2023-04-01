@@ -2,6 +2,8 @@
 
 Game created using ReactJS
 
+Inspired by: https://www.nytimes.com/games/wordle/index.html
+
 ## Available Scripts
 
 In the project directory, you can run:
