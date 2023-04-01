@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useCallback, useEffect } from "react"
 import Letterrow from "../Letterrow/Letterrow"
 
 export default function Game(props){
@@ -8,30 +8,42 @@ export default function Game(props){
     const [currentWord, setCurrentWord] = useState('')
     const [playing, setPlaying] = useState(true)
 
-    const updateCurrentWord = e => {
-        if(!playing)
-            return
-        const word = e.target.value
-        if(word.length <= WORD_LEN)
-            setCurrentWord(word.toUpperCase())
-    }
-
-    const addWordList = e => {
-        e.preventDefault()
-        if(!playing)
-            return
-        if(currentWord.length === WORD_LEN) {
-            const newList = wordList
-            newList.push(currentWord)
-            setWordList(newList)
-            if(currentWord == WORD_TO_GUESS)
-            {
-                setPlaying(false)
-                alert(`Gratulacje, zgadłeś za ${wordList.length} próbą`)
+    const keyPressedHandler = useCallback(e => {
+        var button = e.key
+        console.log(button)
+        if(button === "Enter"){
+            if(currentWord.length === WORD_LEN) {
+                const newList = wordList
+                newList.push(currentWord)
+                setWordList(newList)
+                if(currentWord == WORD_TO_GUESS)
+                {
+                    setPlaying(false)
+                    window.removeEventListener("keyup", keyPressedHandler);
+                    alert(`Gratulacje, zgadłeś za ${wordList.length} próbą`)
+                }
+                setCurrentWord('')
             }
-            setCurrentWord('')
         }
-    }
+        else if(button === "Backspace"){
+            console.log("backspace")
+            const newWord = currentWord.substring(0, currentWord.length-1)
+            setCurrentWord(newWord)
+        }
+        else {
+            if(button.match(/^[A-Za-z]$/g)){
+                const newWord = currentWord + button
+                if(newWord.length <= WORD_LEN){
+                    setCurrentWord(newWord.toUpperCase())
+                }
+            }
+        }
+    },[currentWord, wordList])
+
+    useEffect(() => {
+        window.addEventListener("keyup", keyPressedHandler);
+        return (() => {window.removeEventListener("keyup", keyPressedHandler)})
+    })
 
     return (
     <div className="game">
@@ -43,10 +55,6 @@ export default function Game(props){
                 solution={WORD_TO_GUESS}
                 />
             ))}
-            <form onSubmit={addWordList}>
-                <input type="text" value={currentWord} onChange={updateCurrentWord} />
-                <button type="submit">Dodaj nowy</button>
-            </form>
         </div>
         <Letterrow word={currentWord} wordsize={WORD_LEN} />
     </div>
