@@ -12,5 +12,12 @@
 
 .letterrow {
     display: flex;
+}
 
+.green {
+    background-color: green;
+}
+
+.yellow {
+    background-color: rgb(255, 119, 0);
 }
